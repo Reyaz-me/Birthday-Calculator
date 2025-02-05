@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎀 Birthday Calculator 🎈</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF80AB;
+            --secondary: #80DEEA;
+            --accent: #FF4081;
+            --surface: #FFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--surface);
+            padding: 2.5rem;
+            border-radius: 28px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            transform: scale(0.95);
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-family: 'Comic Neue', cursive;
+            font-size: 2.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-container {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .input-label {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 1.5rem 1rem 1rem;
+            border: 2px solid #eee;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="date"]:focus, input[type="date"]:valid {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        input[type="date"]:focus + .input-label,
+        input[type="date"]:valid + .input-label {
+            top: 30%;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.primary {
+            background: var(--primary);
+        }
+
+        button.secondary {
+            background: var(--secondary);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 64, 129, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            border-radius: 50%;
+            animation: rippleEffect 0.6s linear;
+        }
+
+        @keyframes rippleEffect {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 400px; height: 400px; opacity: 0; }
+        }
+
+        .results {
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        .results.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .age-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .age-box {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .age-box:hover {
+            transform: translateY(-4px);
+        }
+
+        .age-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-family: 'Comic Neue', cursive;
+        }
+
+        .countdown {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .countdown::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2));
+            transform: rotate(45deg);
+            animation: sparkle 3s infinite;
+        }
+
+        @keyframes sparkle {
+            0% { transform: rotate(45deg) translate(-50%, -50%); }
+            100% { transform: rotate(45deg) translate(50%, 50%); }
+        }
+
+        .zodiac {
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .zodiac-icon {
+            font-size: 3rem;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            animation: spin 1s linear infinite;
+            position: relative;
+        }
+
+        .spinner::after {
+            content: '🎂';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Birthday Calculator 🧁</h1>
+        
+        <div class="input-container">
+            <input type="date" id="dob" required>
+            <span class="input-label">Choose Your Birthday</span>
+        </div>
+
+        <div class="button-group">
+            <button class="primary" onclick="calculateAge(event)">
+                <i class="fas fa-wand-magic-sparkles"></i> Calculate
+            </button>
+            <button class="secondary" onclick="resetForm(event)">
+                <i class="fas fa-rainbow"></i> Reset
+            </button>
+        </div>
+
+        <div class="loading">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="age-details" id="ageDetails"></div>
+            
+            <div class="countdown" id="countdown">
+                <h3>⏳ Next Birthday Magic in...</h3>
+                <div id="countdownTimer"></div>
+            </div>
+
+            <div class="zodiac" id="zodiacInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        const ZODIAC_SIGNS = [
+            { emoji: '♑', name: 'Capricorn', dates: [ [1, 1], [1, 19] ] },
+            { emoji: '♒', name: 'Aquarius', dates: [ [1, 20], [2, 18] ] },
+            { emoji: '♓', name: 'Pisces', dates: [ [2, 19], [3, 20] ] },
+            { emoji: '♈', name: 'Aries', dates: [ [3, 21], [4, 19] ] },
+            { emoji: '♉', name: 'Taurus', dates: [ [4, 20], [5, 20] ] },
+            { emoji: '♊', name: 'Gemini', dates: [ [5, 21], [6, 20] ] },
+            { emoji: '♋', name: 'Cancer', dates: [ [6, 21], [7, 22] ] },
+            { emoji: '♌', name: 'Leo', dates: [ [7, 23], [8, 22] ] },
+            { emoji: '♍', name: 'Virgo', dates: [ [8, 23], [9, 22] ] },
+            { emoji: '♎', name: 'Libra', dates: [ [9, 23], [10, 22] ] },
+            { emoji: '♏', name: 'Scorpio', dates: [ [10, 23], [11, 21] ] },
+            { emoji: '♐', name: 'Sagittarius', dates: [ [11, 22], [12, 21] ] },
+            { emoji: '♑', name: 'Capricorn', dates: [ [12, 22], [12, 31] ] }
+        ];
+
+        let countdownInterval = null;
+        document.getElementById('dob').max = new Date().toISOString().split('T')[0];
+
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            const rect = button.getBoundingClientRect();
+            ripple.style.left = event.clientX - rect.left + 'px';
+            ripple.style.top = event.clientY - rect.top + 'px';
+            button.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        function showLoading(show) {
+            document.querySelector('.loading').style.display = show ? 'block' : 'none';
+        }
+
+        function calculateAge(event) {
+            createRipple(event);
+            showLoading(true);
+            
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            setTimeout(() => {
+                const dobInput = document.getElementById('dob');
+                const dob = new Date(dobInput.value);
+                const now = new Date();
+
+                if (!dobInput.value) {
+                    cuteAlert('Please choose your birthday! 🎈');
+                    showLoading(false);
+                    return;
+                }
+
+                if (dob > now) {
+                    cuteAlert('Birthday cannot be in the future! 🚀');
+                    showLoading(false);
+                    return;
+                }
+
+                const age = getAgeDetails(dob, now);
+                displayAge(age);
+                startCountdown(dob);
+                displayZodiac(dob);
+                showLoading(false);
+                document.getElementById('results').classList.add('show');
+            }, 800);
+        }
+
+        function getAgeDetails(dob, now) {
+            let years = now.getFullYear() - dob.getFullYear();
+            let months = now.getMonth() - dob.getMonth();
+            let days = now.getDate() - dob.getDate();
+
+            if (days < 0) {
+                months--;
+                days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const totalDays = Math.floor((now - dob) / (1000 * 60 * 60 * 24));
+            const weeks = Math.floor(totalDays / 7);
+
+            return { years, months, days, weeks, totalDays };
+        }
+
+        function displayAge({ years, months, days, weeks }) {
+            const ageDetails = `
+                <div class="age-box">
+                    <div class="age-value">${years}</div>
+                    <div>Years 🎂</div>
+                </div>
+                <div class="age-box">
+                    <div class="age-value">${months}</div>
+                    <div>Months 🌙</div>
+                </div>
+                <div class="age-box">
+                    <div class="age-value">${days}</div>
+                    <div>Days 🌟</div>
+                </div>
+                <div class="age-box">
+                    <div class="age-value">${weeks}</div>
+                    <div>Weeks 🎈</div>
+                </div>
+            `;
+            document.getElementById('ageDetails').innerHTML = ageDetails;
+        }
+
+        function startCountdown(dob) {
+            const now = new Date();
+            let nextBirthday = new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
+            
+            if (nextBirthday < now) {
+                nextBirthday.setFullYear(now.getFullYear() + 1);
+            }
+
+            function update() {
+                const diff = nextBirthday - new Date();
+                if (diff < 0) {
+                    clearInterval(countdownInterval);
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('countdownTimer').innerHTML = `
+                    <div style="font-size: 1.4rem; margin: 0.5rem 0">
+                        ${days} <span style="font-size: 0.8em">days</span> 
+                        ${hours} <span style="font-size: 0.8em">hrs</span>
+                        ${minutes} <span style="font-size: 0.8em">min</span>
+                        ${seconds} <span style="font-size: 0.8em">sec</span>
+                    </div>
+                `;
+            }
+
+            update();
+            countdownInterval = setInterval(update, 1000);
+        }
+
+        function displayZodiac(dob) {
+            const month = dob.getMonth() + 1;
+            const day = dob.getDate();
+            const zodiac = ZODIAC_SIGNS.find(sign => {
+                const [startMonth, startDay] = sign.dates[0];
+                const [endMonth, endDay] = sign.dates[1];
+                return (month === startMonth && day >= startDay) ||
+                       (month === endMonth && day <= endDay);
+            });
+
+            document.getElementById('zodiacInfo').innerHTML = `
+                <div class="zodiac-icon">${zodiac.emoji}</div>
+                <div>
+                    <h3>${zodiac.name}</h3>
+                    <p>${getZodiacTrait(zodiac.name)}</p>
+                </div>
+            `;
+        }
+
+        function getZodiacTrait(name) {
+            const traits = {
+                'Capricorn': 'Ambitious Achiever 🌟',
+                'Aquarius': 'Innovative Thinker 💡',
+                'Pisces': 'Creative Dreamer 🎨',
+                'Aries': 'Bold Pioneer 🔥',
+                'Taurus': 'Reliable Rock 🌿',
+                'Gemini': 'Curious Communicator 💬',
+                'Cancer': 'Nurturing Soul 🏡',
+                'Leo': 'Charismatic Star 🌞',
+                'Virgo': 'Detail Master 🔍',
+                'Libra': 'Harmony Seeker ⚖️',
+                'Scorpio': 'Passionate Detective 🕵️',
+                'Sagittarius': 'Adventurous Explorer 🌍'
+            };
+            return traits[name];
+        }
+
+        function resetForm(event) {
+            createRipple(event);
+            document.getElementById('dob').value = '';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('ageDetails').innerHTML = '';
+            document.getElementById('countdownTimer').innerHTML
+            = "; document.getElementById( 'zodiacInfo').innerHTML = "; if (countdownInterval) clearInterval(countdownInterval); }
+                function cuteAlert(message) {
+        const alertBox = document.createElement('div');
+        alertBox.style.position = 'fixed';
+        alertBox.style.top = '20px';
+        alertBox.style.left = '50%';
+        alertBox.style.transform = 'translateX(-50%)';
+        alertBox.style.backgroundColor = 'white';
+        alertBox.style.padding = '1rem 2rem';
+        alertBox.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+        alertBox.style.borderRadius = '12px';
+        alertBox.style.fontFamily = "'Comic Neue', cursive";
+        alertBox.style.color = 'var(--accent)';
+        alertBox.style.fontSize = '1.2rem';
+        alertBox.style.display = 'flex';
+        alertBox.style.alignItems = 'center';
+        alertBox.style.gap = '10px';
+        alertBox.style.zIndex = '1000';
+        alertBox.innerHTML = `
+            <i class="fas fa-exclamation-circle"></i>
+            ${message}
+        `;
+        document.body.appendChild(alertBox);
+
+        setTimeout(() => {
+            alertBox.style.opacity = '0';
+            setTimeout(() => alertBox.remove(), 300);
+        }, 3000);
+    }
+</script>
+</body>
+</html>
